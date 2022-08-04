@@ -1,26 +1,28 @@
 package com.example.demo.student;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.time.Month;
 import java.util.List;
 
 @RestController // this tells the server to serve REST endpoints
 @RequestMapping(path = "api/v1/student")
 public class StudentController {
+    private final StudentService studentService;
+
+    @Autowired  // tells Spring to 'magically' instantiate and inject the studentService from above
+    public StudentController(StudentService studentService) {
+        // this.studentService = new StudentService();  // don't do this; use dependency injection instead
+        this.studentService = studentService;  // uses dependency injection
+    }
+
     @GetMapping
     public List<Student> getStudents() {
-        return List.of(
-            new Student(
-                    1L,
-                    "Mariam",
-                    "mariam.jamal@gmail.com",
-                    LocalDate.of(2000, Month.JANUARY, 5),
-                    22
-            )
-        );
+        return studentService.getStudents();
+    }
+
+    @PostMapping
+    public void registerNewStudent(@RequestBody Student student) {  // map the request body into a student
+        studentService.addNewStudent(student);
     }
 }
